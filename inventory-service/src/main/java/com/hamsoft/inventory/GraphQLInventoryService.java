@@ -32,10 +32,6 @@ public class GraphQLInventoryService {
     public boolean remove(String  licensePlateNumber) {
         List<Car> cars = carInventory.getCars();
         Optional<Car> carToRemove  = cars.stream().filter(car -> car.licensePlateNumber.equals(licensePlateNumber)).findAny();
-        if(carToRemove.isPresent()) {
-          return carInventory.getCars().remove(carToRemove.get());
-        }else {
-            return false;
-        }
+        return carToRemove.map(car -> carInventory.getCars().remove(car)).orElse(false);
     }
 }

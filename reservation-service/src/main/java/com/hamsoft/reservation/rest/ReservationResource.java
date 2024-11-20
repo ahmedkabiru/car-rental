@@ -1,11 +1,13 @@
 package com.hamsoft.reservation.rest;
 
 import com.hamsoft.reservation.inventory.Car;
+import com.hamsoft.reservation.inventory.GraphQLInventoryClient;
 import com.hamsoft.reservation.inventory.InventoryClient;
 import com.hamsoft.reservation.rental.RentalClient;
 import com.hamsoft.reservation.reservation.Reservation;
 import com.hamsoft.reservation.reservation.ReservationRepository;
 import io.quarkus.logging.Log;
+import io.smallrye.graphql.client.GraphQLClient;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -24,8 +26,9 @@ public class ReservationResource {
     private final RentalClient rentalClient;
 
     public ReservationResource(ReservationRepository reservationRepository,
-                               InventoryClient inventoryClient,
-                               @RestClient  RentalClient rentalClient) {
+                               @RestClient  RentalClient rentalClient,
+                               @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient
+                               ) {
         this.reservationRepository = reservationRepository;
         this.inventoryClient = inventoryClient;
         this.rentalClient = rentalClient;
