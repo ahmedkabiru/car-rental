@@ -1,9 +1,11 @@
-package com.hamsoft.inventory;
+package com.hamsoft.inventory.graphql;
 
 import com.hamsoft.inventory.database.CarInventory;
 import com.hamsoft.inventory.model.Car;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.graphql.*;
+import org.eclipse.microprofile.graphql.Description;
+import org.eclipse.microprofile.graphql.GraphQLApi;
+import org.eclipse.microprofile.graphql.Mutation;
+import org.eclipse.microprofile.graphql.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +13,11 @@ import java.util.Optional;
 @GraphQLApi
 public class GraphQLInventoryService {
 
-    @Inject
-    CarInventory carInventory;
+    private final CarInventory carInventory;
 
+    public GraphQLInventoryService(CarInventory carInventory) {
+        this.carInventory = carInventory;
+    }
 
     @Query
     @Description("List of Cars")
