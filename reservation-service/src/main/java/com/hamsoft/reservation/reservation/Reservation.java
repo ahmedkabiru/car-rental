@@ -8,6 +8,8 @@ public class Reservation {
 
     public Long carId;
 
+    public Long userId;
+
     public LocalDate startDay;
 
     public LocalDate endDay;

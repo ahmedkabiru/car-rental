@@ -15,6 +15,7 @@
         <option value="$PROJECT_DIR$/reservation-service/pom.xml" />
         <option value="$PROJECT_DIR$/inventory-service/pom.xml" />
         <option value="$PROJECT_DIR$/inventory-cli/pom.xml" />
+        <option value="$PROJECT_DIR$/users-service/pom.xml" />
       </list>
     </option>
   </component>
