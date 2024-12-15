@@ -1,38 +1,33 @@
 package com.hamsoft.rental;
 
+import io.quarkus.mongodb.panache.PanacheMongoEntity;
+import io.quarkus.mongodb.panache.common.MongoEntity;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
-public class Rental {
+@MongoEntity(collection = "Rentals")
+public class Rental extends PanacheMongoEntity {
 
-    private final Long id;
+    public String userId;
 
-    private final String userId;
+    public Long reservationId;
 
-    private final Long reservationId;
+    public LocalDate startDate;
 
-    private final LocalDate localDate;
+    public LocalDate endDate;
 
+    @BsonProperty("rental-active")
+    public boolean active;
 
-    public Rental(Long id, String userId, Long reservationId, LocalDate localDate) {
-        this.id = id;
-        this.userId = userId;
-        this.reservationId = reservationId;
-        this.localDate = localDate;
+    public static Optional<Rental> findByUserAndReservationIds(String userId, Long reservationId) {
+        return find("userId = ?1 and  reservationId = ?2", userId, reservationId).firstResultOptional();
     }
 
-    public Long getId() {
-        return id;
+    public static List<Rental> listActive() {
+        return list("active", true);
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public Long getReservationId() {
-        return reservationId;
-    }
-
-    public LocalDate getLocalDate() {
-        return localDate;
-    }
 }
