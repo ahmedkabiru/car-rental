@@ -1,8 +1,8 @@
 package com.hamsoft.reservation;
 
+import com.hamsoft.reservation.entity.Reservation;
 import com.hamsoft.reservation.inventory.Car;
 import com.hamsoft.reservation.inventory.GraphQLInventoryClient;
-import com.hamsoft.reservation.reservation.Reservation;
 import com.hamsoft.reservation.rest.ReservationResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;

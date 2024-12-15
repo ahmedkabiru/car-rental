@@ -1,15 +1,15 @@
 package com.hamsoft.reservation.rest;
 
+import com.hamsoft.reservation.entity.Reservation;
 import com.hamsoft.reservation.inventory.Car;
 import com.hamsoft.reservation.inventory.GraphQLInventoryClient;
 import com.hamsoft.reservation.inventory.InventoryClient;
 import com.hamsoft.reservation.rental.RentalClient;
-import com.hamsoft.reservation.reservation.Reservation;
-import com.hamsoft.reservation.reservation.ReservationRepository;
 import io.smallrye.graphql.client.GraphQLClient;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.SecurityContext;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestQuery;
 
@@ -24,19 +24,17 @@ import java.util.Map;
 public class ReservationResource {
 
 
-    private final ReservationRepository reservationRepository;
-    private final InventoryClient inventoryClient;
+    final InventoryClient inventoryClient;
     private final RentalClient rentalClient;
-    private final SecurityContext context;
 
-    public ReservationResource(ReservationRepository reservationRepository,
-                               @RestClient  RentalClient rentalClient,
-                               @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient, SecurityContext context
+    @Inject
+    jakarta.ws.rs.core.SecurityContext context;
+
+    public ReservationResource(@RestClient RentalClient rentalClient,
+                               @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient
     ) {
-        this.reservationRepository = reservationRepository;
         this.inventoryClient = inventoryClient;
         this.rentalClient = rentalClient;
-        this.context = context;
     }
 
     @GET
@@ -47,7 +45,7 @@ public class ReservationResource {
         for (Car car : cars) {
             carsById.put(car.id, car);
         }
-        List<Reservation> reservations = reservationRepository.findAll();
+        List<Reservation> reservations = Reservation.listAll();
         for(Reservation reservation : reservations){
             if(reservation.isReserved()){
                 carsById.remove(reservation.carId);
@@ -58,19 +56,24 @@ public class ReservationResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
+    @Transactional
     public  Reservation make(Reservation reservation){
-        Reservation result =  reservationRepository.save(reservation);
-        String userId = context.getUserPrincipal().getName() != null ? context.getUserPrincipal().getName() : "anonymous";
+        reservation.userId = context.getUserPrincipal() != null ? context.getUserPrincipal().getName() : "anonymous";
+        reservation.persist();
         if(reservation.startDay.equals(LocalDate.now())){
-            rentalClient.start(userId,result.id);
+            rentalClient.start(reservation.userId, reservation.id);
         }
-        return result;
+        return reservation;
     }
 
     @GET
     @Path("all")
-    public Collection<Reservation> getAllReservations() {
-        var userId = context.getUserPrincipal().getName() != null ? context.getUserPrincipal().getName() : null;
-        return reservationRepository.findAll().stream().filter(reservation -> (userId == null) || (userId.equals(reservation.userId))).toList();
+    public Collection<Reservation> allReservations() {
+        String userId = context.getUserPrincipal() != null ?
+                context.getUserPrincipal().getName() : null;
+        return Reservation.<Reservation>streamAll()
+                .filter(reservation -> userId == null ||
+                        userId.equals(reservation.userId))
+                .toList();
     }
 }

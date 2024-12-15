@@ -6,6 +6,6 @@ public class Reservation {
     public Long id;
     public String userId;
     public Long carId;
-    public LocalDate startDate;
-    public LocalDate endDate;
+    public LocalDate startDay;
+    public LocalDate endDay;
 }
