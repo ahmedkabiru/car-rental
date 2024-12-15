@@ -1,7 +1,8 @@
 package com.hamsoft.inventory.graphql;
 
-import com.hamsoft.inventory.database.CarInventory;
+import com.hamsoft.inventory.database.CarRepository;
 import com.hamsoft.inventory.model.Car;
+import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.graphql.Description;
 import org.eclipse.microprofile.graphql.GraphQLApi;
 import org.eclipse.microprofile.graphql.Mutation;
@@ -13,29 +14,33 @@ import java.util.Optional;
 @GraphQLApi
 public class GraphQLInventoryService {
 
-    private final CarInventory carInventory;
+    private final CarRepository carRepository;
 
-    public GraphQLInventoryService(CarInventory carInventory) {
-        this.carInventory = carInventory;
+    public GraphQLInventoryService(CarRepository carRepository) {
+        this.carRepository = carRepository;
     }
 
     @Query
     @Description("List of Cars")
     public List<Car> cars() {
-        return  carInventory.getCars();
+        return carRepository.listAll();
     }
 
+    @Transactional
     @Mutation
     public Car createCar(Car car) {
-        car.id = CarInventory.id.incrementAndGet();
-        carInventory.getCars().add(car);
+        carRepository.persist(car);
         return car;
     }
 
     @Mutation
     public boolean remove(String  licensePlateNumber) {
-        List<Car> cars = carInventory.getCars();
-        Optional<Car> carToRemove  = cars.stream().filter(car -> car.licensePlateNumber.equals(licensePlateNumber)).findAny();
-        return carToRemove.map(car -> carInventory.getCars().remove(car)).orElse(false);
+        Optional<Car> car = carRepository.findByLicensePlateNumber(licensePlateNumber);
+        if (car.isPresent()) {
+            carRepository.delete(car.get());
+            return true;
+        } else {
+            return false;
+        }
     }
 }

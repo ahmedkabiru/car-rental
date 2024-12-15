@@ -37,3 +37,4 @@ build/
 ### Mac OS ###
 .DS_Store!/.idea/GitlabLint.xml
 !/.quarkus/
+!/.idea/dataSources.xml
