@@ -1,6 +1,8 @@
 package com.hamsoft.reservation.entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
+import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Entity;
 
 import java.time.LocalDate;
@@ -25,7 +27,7 @@ public class Reservation extends PanacheEntity {
     }
 
 
-    public static List<Reservation> findByCar(Long carId) {
+    public static Uni<List<Reservation>> findByCar(Long carId) {
         return list("carId", carId);
     }
 

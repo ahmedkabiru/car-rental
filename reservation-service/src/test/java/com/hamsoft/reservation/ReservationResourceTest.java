@@ -10,6 +10,7 @@ import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
+import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -52,7 +53,7 @@ class ReservationResourceTest {
     void testMakeReservationAndCheckingAvailability() {
         GraphQLInventoryClient mock = Mockito.mock(GraphQLInventoryClient.class);
         Car peugeot = new Car(1L, "ABC 123", "Peugeot", "406");
-        Mockito.when(mock.allCars()).thenReturn(Collections.singletonList(peugeot));
+        Mockito.when(mock.allCars()).thenReturn(Uni.createFrom().item(Collections.singletonList(peugeot)));
         QuarkusMock.installMockForType(mock, GraphQLInventoryClient.class);
 
         var startDate = "2022-01-01";
